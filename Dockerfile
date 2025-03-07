@@ -37,11 +37,19 @@ RUN set -eux; \
     printf -- '%s\n' >| /app/bin/entrypoint.sh \
         '#!/usr/bin/env bash' '' \
         'set -e' '' '. /app/bin/activate' '' \
+        '# Change runtime user UID and GID' \
+        'PGID="${PGID:-1100}"' \
+        'groupmod -o -g "$PGID" app' \
+        'PUID="${PUID:-1100}"' \
+        'usermod -o -u "$PUID" app' '' \
+        'chown app /app' \
+        'chgrp -R app /app' \
+        'chmod -R g+w /app' '' \
         'pip install --upgrade pip' '' \
         'exec "$@"' \
         && \
     chmod -c 00755 /app/bin/entrypoint.sh && \
-    chown -R app:app /app && \
+    chown -R root:app /app && \
     install -d -o root -g root -m 01777 /cache
 
 VOLUME ["/cache"]
