@@ -37,15 +37,15 @@ RUN set -eux; \
     printf -- '%s\n' >| /app/bin/entrypoint.sh \
         '#!/usr/bin/env bash' '' \
         'set -e' '' '. /app/bin/activate' '' \
+	'pip install --upgrade pip' '' \
         '# Change runtime user UID and GID' \
         'PGID="${PGID:-1100}"' \
-        'groupmod -o -g "$PGID" app' \
+        'groupmod -o -g "$PGID" app || :' \
         'PUID="${PUID:-1100}"' \
-        'usermod -o -u "$PUID" app' '' \
-        'chown app /app' \
-        'chgrp -R app /app' \
-        'chmod -R g+w /app' '' \
-        'pip install --upgrade pip' '' \
+        'usermod -o -u "$PUID" app || :' '' \
+        'chown app "${HOME}"' \
+        'chgrp -R app "${HOME}" "${XDG_CACHE_HOME}"/*' \
+        'chmod -R g+w "${HOME}" "${XDG_CACHE_HOME}"/*' '' \
         'exec "$@"' \
         && \
     chmod -c 00755 /app/bin/entrypoint.sh && \
