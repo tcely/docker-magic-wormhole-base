@@ -25,7 +25,31 @@ RUN set -eux; \
     printf -- "en_US.UTF-8 UTF-8\n" > /etc/locale.gen && \
     locale-gen en_US.UTF-8 ; \
 	apt-get install -y --no-install-recommends \
+        ca-certificates \
         curl \
         less \
-        procps
+        procps \
+        ; \
+    # Create a 'app' user which the application will run as
+    groupadd app && \
+    useradd -M -d /app -s /bin/false -g app app && \
+    python3 -m venv /app && \
+    printf -- '%s\n' >| /app/bin/entrypoint.sh \
+        '#!/usr/bin/env bash' '' \
+        'set -e' '' '. /app/bin/activate' '' \
+        'pip install --upgrade pip' '' \
+        'exec "$@"' \
+        && \
+    chmod -c 00755 /app/bin/entrypoint.sh && \
+    chown -R app:app /app && \
+    install -d -o root -g root -m 01777 /cache
 
+VOLUME ["/cache"]
+WORKDIR /app
+
+ENV HOME="/app" \
+    PYTHONPYCACHEPREFIX="/cache/pycache" \
+    XDG_CACHE_HOME="/cache"
+
+ENTRYPOINT ["/app/bin/entrypoint.sh"]
+CMD "pip list"
