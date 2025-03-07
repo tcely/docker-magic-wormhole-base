@@ -60,4 +60,4 @@ ENV HOME="/app" \
     XDG_CACHE_HOME="/cache"
 
 ENTRYPOINT ["/app/bin/entrypoint.sh"]
-CMD "pip list"
+CMD ["pip", "list"]
