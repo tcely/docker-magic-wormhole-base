@@ -47,6 +47,7 @@ RUN set -eux; \
         '  groupmod -o -g "$PGID" app' \
         '  PUID="${PUID:-1100}"' \
         '  usermod -o -u "$PUID" app' '' \
+        '  chown -R app:app "${HOME}"' \
         '  su --preserve-environment --session-command "pip install --upgrade pip" -s /bin/sh -g app app' \
         'else' \
         '  pip install --upgrade pip || :' \
