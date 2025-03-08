@@ -34,6 +34,9 @@ RUN set -eux; \
     groupadd app && \
     useradd -M -d /app -s /bin/false -g app app && \
     python3 -m venv /app && \
+    install -d -o root -g root -m 01777 /cache
+
+RUN set -eux; \
     printf -- '%s\n' >| /app/bin/entrypoint.sh \
         '#!/usr/bin/env bash' '' \
         'set -e' '' '. /app/bin/activate' '' \
@@ -51,9 +54,9 @@ RUN set -eux; \
         'exec "$@"' \
         && \
     chmod -c 00755 /app/bin/entrypoint.sh && \
-    chown -R app:app /app && \
-    install -d -o root -g root -m 01777 /cache
+    chown -R app:app /app
 
+USER app
 VOLUME ["/cache"]
 WORKDIR /app
 
