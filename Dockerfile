@@ -43,8 +43,8 @@ RUN set -eux; \
         'PUID="${PUID:-1100}"' \
         'usermod -o -u "$PUID" app || :' '' \
         'chown app "${HOME}"' \
-        'chgrp -R app "${HOME}" "${XDG_CACHE_HOME}"/*' \
-        'chmod -R g+w "${HOME}" "${XDG_CACHE_HOME}"/*' '' \
+        'chgrp -R app "${HOME}"' \
+        'chmod -R g+w "${HOME}"' '' \
         'su --preserve-environment --session-command "pip install --upgrade pip" -s /bin/sh -g app app || :' \
         '' 'exec "$@"' \
         && \
