@@ -19,12 +19,12 @@ ENV DEBIAN_FRONTEND="noninteractive" \
 RUN set -eux; \
     # Update from the network and keep cache
     rm -v -f /etc/apt/apt.conf.d/docker-clean && \
-	apt-get update ; \
+    apt-get update ; \
     # Install locales
     apt-get install -y --no-install-recommends locales && \
     printf -- "en_US.UTF-8 UTF-8\n" > /etc/locale.gen && \
     locale-gen en_US.UTF-8 ; \
-	apt-get install -y --no-install-recommends \
+    apt-get install -y --no-install-recommends \
         ca-certificates \
         curl \
         less \
@@ -37,7 +37,6 @@ RUN set -eux; \
     printf -- '%s\n' >| /app/bin/entrypoint.sh \
         '#!/usr/bin/env bash' '' \
         'set -e' '' '. /app/bin/activate' '' \
-	'pip install --upgrade pip' '' \
         '# Change runtime user UID and GID' \
         'PGID="${PGID:-1100}"' \
         'groupmod -o -g "$PGID" app || :' \
@@ -46,7 +45,8 @@ RUN set -eux; \
         'chown app "${HOME}"' \
         'chgrp -R app "${HOME}" "${XDG_CACHE_HOME}"/*' \
         'chmod -R g+w "${HOME}" "${XDG_CACHE_HOME}"/*' '' \
-        'exec "$@"' \
+        'su --preserve-environment --session-command "pip install --upgrade pip" -s /bin/sh -g app app || :' \
+        '' 'exec "$@"' \
         && \
     chmod -c 00755 /app/bin/entrypoint.sh && \
     chown -R root:app /app && \
